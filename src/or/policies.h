@@ -61,9 +61,6 @@ int fascist_firewall_choose_address_rs(const routerstatus_t *rs,
 int fascist_firewall_choose_address_node(const node_t *node,
                                          firewall_connection_t fw_connection,
                                          int pref_only, tor_addr_port_t* ap);
-int fascist_firewall_choose_address_dir_server(const dir_server_t *ds,
-                                          firewall_connection_t fw_connection,
-                                          int pref_only, tor_addr_port_t* ap);
 
 int dir_policy_permits_address(const tor_addr_t *addr);
 int socks_policy_permits_address(const tor_addr_t *addr);

@@ -1036,26 +1036,6 @@ fascist_firewall_choose_address_node(const node_t *node,
                                               ap);
 }
 
-/** Like fascist_firewall_choose_address_rs(), but takes <b>ds</b>. */
-int
-fascist_firewall_choose_address_dir_server(const dir_server_t *ds,
-                                           firewall_connection_t fw_connection,
-                                           int pref_only,
-                                           tor_addr_port_t *ap)
-{
-  if (!ds) {
-    return 0;
-  }
-
-  /* A dir_server_t always has a fake_status. As long as it has the same
-   * addresses/ports in both fake_status and dir_server_t, this works fine.
-   * (See #17867.)
-   * This function relies on fascist_firewall_choose_address_rs looking up the
-   * node if it can, because that will get the latest info for the relay. */
-  return fascist_firewall_choose_address_rs(&ds->fake_status, fw_connection,
-                                            pref_only, ap);
-}
-
 /** Return 1 if <b>addr</b> is permitted to connect to our dir port,
  * based on <b>dir_policy</b>. Else return 0.
  */
