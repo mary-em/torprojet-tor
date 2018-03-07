@@ -268,7 +268,7 @@ static config_var_t option_vars_[] = {
   V(ClientDNSRejectInternalAddresses, BOOL,"1"),
   V(ClientOnly,                  BOOL,     "0"),
   V(ClientPreferIPv6ORPort,      AUTOBOOL, "auto"),
-  V(ClientPreferIPv6DirPort,     AUTOBOOL, "auto"),
+  OBSOLETE("ClientPreferIPv6DirPort"),
   V(ClientRejectInternalAddresses, BOOL,   "1"),
   V(ClientTransportPlugin,       LINELIST, NULL),
   V(ClientUseIPv6,               BOOL,     "0"),
@@ -725,8 +725,6 @@ static const config_deprecation_t option_deprecation_notes_[] = {
 
   /* Options deprecated since 0.3.2.2-alpha */
   { "ReachableDirAddresses", "It has no effect on relays, and has had no "
-    "effect on clients since 0.2.8." },
-  { "ClientPreferIPv6DirPort", "It has no effect on relays, and has had no "
     "effect on clients since 0.2.8." },
   /* End of options deprecated since 0.3.2.2-alpha. */
 

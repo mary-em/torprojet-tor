@@ -2001,13 +2001,7 @@ test_policies_fascist_firewall_choose_address(void *arg)
   tt_assert(fascist_firewall_choose_address(&ipv4_or_ap, &ipv6_or_ap, 1,
                                             FIREWALL_OR_CONNECTION, 1, 0)
             == &ipv4_or_ap);
-  tt_assert(fascist_firewall_choose_address(&ipv4_dir_ap, &ipv6_dir_ap, 1,
-                                            FIREWALL_DIR_CONNECTION, 0, 0)
-            == &ipv4_dir_ap);
-  tt_assert(fascist_firewall_choose_address(&ipv4_dir_ap, &ipv6_dir_ap, 1,
-                                            FIREWALL_DIR_CONNECTION, 1, 0)
-            == &ipv4_dir_ap);
-
+  
   /* Prefer IPv6 */
   tt_assert(fascist_firewall_choose_address(&ipv4_or_ap, &ipv6_or_ap, 0,
                                             FIREWALL_OR_CONNECTION, 0, 1)
@@ -2015,12 +2009,6 @@ test_policies_fascist_firewall_choose_address(void *arg)
   tt_assert(fascist_firewall_choose_address(&ipv4_or_ap, &ipv6_or_ap, 0,
                                             FIREWALL_OR_CONNECTION, 1, 1)
             == &ipv6_or_ap);
-  tt_assert(fascist_firewall_choose_address(&ipv4_dir_ap, &ipv6_dir_ap, 0,
-                                            FIREWALL_DIR_CONNECTION, 0, 1)
-            == &ipv6_dir_ap);
-  tt_assert(fascist_firewall_choose_address(&ipv4_dir_ap, &ipv6_dir_ap, 0,
-                                            FIREWALL_DIR_CONNECTION, 1, 1)
-            == &ipv6_dir_ap);
 
   /* Unusual inputs */
 
@@ -2044,9 +2032,6 @@ test_policies_fascist_firewall_choose_address(void *arg)
   tt_assert(fascist_firewall_choose_address(&ipv4_dir_ap, &n_ipv6_ap, 0,
                                             FIREWALL_DIR_CONNECTION, 0, 1)
             == &ipv4_dir_ap);
-  tt_assert(fascist_firewall_choose_address(&n_ipv4_ap, &ipv6_dir_ap, 1,
-                                            FIREWALL_DIR_CONNECTION, 0, 0)
-            == &ipv6_dir_ap);
 
   /* null both Dir addresses */
   tt_ptr_op(fascist_firewall_choose_address(&n_ipv4_ap, &n_ipv6_ap, 0,
@@ -2084,8 +2069,7 @@ test_policies_fascist_firewall_choose_address(void *arg)
 
   tor_addr_copy(&fake_rs.ipv6_addr, &ipv6_or_ap.addr);
   fake_rs.ipv6_orport = ipv6_or_ap.port;
-  /* In a routerstatus, the IPv4 and IPv6 DirPorts are the same.*/
-  ipv6_dir_ap.port = TEST_IPV4_DIR_PORT;
+  
 
   /* Make a fake node. Even though it contains the fake_rs, a lookup won't
   * find the node from the rs, because they're not in the hash table. */
@@ -2101,7 +2085,6 @@ test_policies_fascist_firewall_choose_address(void *arg)
 
   /* Preferring IPv4 */
   mock_options.ClientPreferIPv6ORPort = 0;
-  mock_options.ClientPreferIPv6DirPort = 0;
   /* Simulate the initialisation of fake_node.ipv6_preferred */
   fake_node.ipv6_preferred = fascist_firewall_prefer_ipv6_orport(
                                                                 &mock_options);
@@ -2117,7 +2100,6 @@ test_policies_fascist_firewall_choose_address(void *arg)
 
   /* Auto (Preferring IPv4) */
   mock_options.ClientPreferIPv6ORPort = -1;
-  mock_options.ClientPreferIPv6DirPort = -1;
   /* Simulate the initialisation of fake_node.ipv6_preferred */
   fake_node.ipv6_preferred = fascist_firewall_prefer_ipv6_orport(
                                                                 &mock_options);
@@ -2133,39 +2115,6 @@ test_policies_fascist_firewall_choose_address(void *arg)
 
   /* Preferring IPv6 */
   mock_options.ClientPreferIPv6ORPort = 1;
-  mock_options.ClientPreferIPv6DirPort = 1;
-  /* Simulate the initialisation of fake_node.ipv6_preferred */
-  fake_node.ipv6_preferred = fascist_firewall_prefer_ipv6_orport(
-                                                                &mock_options);
-
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_OR_CONNECTION, 0, 1,
-                       ipv6_or_ap);
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_OR_CONNECTION, 1, 1,
-                       ipv6_or_ap);
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_DIR_CONNECTION, 0, 1,
-                       ipv6_dir_ap);
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_DIR_CONNECTION, 1, 1,
-                       ipv6_dir_ap);
-
-  /* Preferring IPv4 OR / IPv6 Dir */
-  mock_options.ClientPreferIPv6ORPort = 0;
-  mock_options.ClientPreferIPv6DirPort = 1;
-  /* Simulate the initialisation of fake_node.ipv6_preferred */
-  fake_node.ipv6_preferred = fascist_firewall_prefer_ipv6_orport(
-                                                                &mock_options);
-
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_OR_CONNECTION, 0, 1,
-                       ipv4_or_ap);
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_OR_CONNECTION, 1, 1,
-                       ipv4_or_ap);
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_DIR_CONNECTION, 0, 1,
-                       ipv6_dir_ap);
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_DIR_CONNECTION, 1, 1,
-                       ipv6_dir_ap);
-
-  /* Preferring IPv6 OR / IPv4 Dir */
-  mock_options.ClientPreferIPv6ORPort = 1;
-  mock_options.ClientPreferIPv6DirPort = 0;
   /* Simulate the initialisation of fake_node.ipv6_preferred */
   fake_node.ipv6_preferred = fascist_firewall_prefer_ipv6_orport(
                                                                 &mock_options);
@@ -2187,7 +2136,7 @@ test_policies_fascist_firewall_choose_address(void *arg)
 
   /* Preferring IPv4 */
   mock_options.ClientPreferIPv6ORPort = 0;
-  mock_options.ClientPreferIPv6DirPort = 0;
+  
   /* Simulate the initialisation of fake_node.ipv6_preferred */
   fake_node.ipv6_preferred = fascist_firewall_prefer_ipv6_orport(
                                                                 &mock_options);
@@ -2208,8 +2157,7 @@ test_policies_fascist_firewall_choose_address(void *arg)
    * - all clients, including bridge clients, prefer IPv4 Dir by default.
    */
   mock_options.ClientPreferIPv6ORPort = -1;
-  mock_options.ClientPreferIPv6DirPort = -1;
-
+ 
   /* Simulate the initialisation of fake_node.ipv6_preferred with a bridge
    * configured with an IPv4 address */
   fake_node.ipv6_preferred = 0;
@@ -2238,7 +2186,7 @@ test_policies_fascist_firewall_choose_address(void *arg)
 
   /* Preferring IPv6 */
   mock_options.ClientPreferIPv6ORPort = 1;
-  mock_options.ClientPreferIPv6DirPort = 1;
+ 
   /* Simulate the initialisation of fake_node.ipv6_preferred */
   fake_node.ipv6_preferred = fascist_firewall_prefer_ipv6_orport(
                                                                 &mock_options);
@@ -2248,16 +2196,15 @@ test_policies_fascist_firewall_choose_address(void *arg)
   CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_OR_CONNECTION, 1, 1,
                        ipv6_or_ap);
   CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_DIR_CONNECTION, 0, 1,
-                       ipv6_dir_ap);
+                       ipv4_dir_ap);
   CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_DIR_CONNECTION, 1, 1,
-                       ipv6_dir_ap);
+                       ipv4_dir_ap);
 
   /* In the default configuration (Auto / IPv6 off), bridge clients should
    * use both IPv4 and IPv6, but only prefer IPv6 for bridges configured with
    * an IPv6 address, regardless of ClientUseIPv6. (See above.) */
   mock_options.ClientUseIPv6 = 0;
   mock_options.ClientPreferIPv6ORPort = -1;
-  mock_options.ClientPreferIPv6DirPort = -1;
   /* Simulate the initialisation of fake_node.ipv6_preferred with a bridge
    * configured with an IPv4 address */
   fake_node.ipv6_preferred = 0;
@@ -2313,10 +2260,7 @@ test_policies_fascist_firewall_choose_address(void *arg)
                        ipv6_or_ap);
   CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_OR_CONNECTION, 1, 1,
                        ipv6_or_ap);
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_DIR_CONNECTION, 0, 1,
-                       ipv6_dir_ap);
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_DIR_CONNECTION, 1, 1,
-                       ipv6_dir_ap);
+ 
 
   /* Choose an address with ClientUseIPv4 0.
    * This means "use IPv6" regardless of the other settings. */
@@ -2331,10 +2275,6 @@ test_policies_fascist_firewall_choose_address(void *arg)
                        ipv6_or_ap);
   CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_OR_CONNECTION, 1, 1,
                        ipv6_or_ap);
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_DIR_CONNECTION, 0, 1,
-                       ipv6_dir_ap);
-  CHECK_CHOSEN_ADDR_RN(fake_rs, fake_node, FIREWALL_DIR_CONNECTION, 1, 1,
-                       ipv6_dir_ap);
 
   /* Choose an address with ORPort_set 1 (server mode).
    * This means "use IPv4" regardless of the other settings. */
@@ -2343,8 +2283,6 @@ test_policies_fascist_firewall_choose_address(void *arg)
   mock_options.ClientUseIPv4 = 0;
   mock_options.ClientUseIPv6 = 1;
   mock_options.ClientPreferIPv6ORPort = 1;
-  mock_options.ClientPreferIPv6DirPort = 1;
-
   /* Simulate the initialisation of fake_node.ipv6_preferred */
   fake_node.ipv6_preferred = fascist_firewall_prefer_ipv6_orport(
                                                                 &mock_options);
