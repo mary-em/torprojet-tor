@@ -4288,7 +4288,7 @@ typedef struct {
    * connections. If auto, bridge clients prefer IPv6, and other clients
    * prefer IPv4. Use node_ipv6_or_preferred() instead of accessing this value
    * directly. */
-  int ClientPreferIPv6ORPort; 
+  int ClientPreferIPv6ORPort;
   /** The length of time that we think a consensus should be fresh. */
   int V3AuthVotingInterval;
   /** The length of time we think it will take to distribute votes. */

@@ -589,8 +589,6 @@ fascist_firewall_allows_ri_impl(const routerinfo_t *ri,
   if (!ri) {
     return 0;
   }
-
-  
   return fascist_firewall_allows_base(ri->addr, ri->or_port, ri->dir_port,
                                       &ri->ipv6_addr, ri->ipv6_orport,
                                       fw_connection, pref_only,
@@ -606,9 +604,7 @@ fascist_firewall_allows_rs_impl(const routerstatus_t *rs,
   if (!rs) {
     return 0;
   }
-
-  
-  return fascist_firewall_allows_base(rs->addr, rs->or_port, rs->dir_port,
+    return fascist_firewall_allows_base(rs->addr, rs->or_port, rs->dir_port,
                                       &rs->ipv6_addr, rs->ipv6_orport,
                                        fw_connection, pref_only,
                                       pref_ipv6);
@@ -821,12 +817,13 @@ fascist_firewall_choose_address_base(const tor_addr_t *ipv4_addr,
                   : ipv4_dirport);
 
   tor_addr_port_t ipv6_ap;
-  if (fw_connection == FIREWALL_OR_CONNECTION){
-	  tor_addr_copy(&ipv6_ap.addr, ipv6_addr);
-	  ipv6_ap.port = ipv6_orport;
-  }else{
-	  tor_addr_make_null(&ipv6_ap.addr,AF_INET6);
-	  ipv6_ap.port = 0;
+  if (fw_connection == FIREWALL_OR_CONNECTION) {
+      tor_addr_copy(&ipv6_ap.addr, ipv6_addr);
+      ipv6_ap.port = ipv6_orport;
+  } else
+  {
+       tor_addr_make_null(&ipv6_ap.addr,AF_INET6);
+       ipv6_ap.port = 0;
   }
   result = fascist_firewall_choose_address(&ipv4_ap, &ipv6_ap,
                                            want_ipv4,
@@ -980,7 +977,6 @@ fascist_firewall_choose_address_node(const node_t *node,
 
   tor_addr_port_t ipv6_or_ap;
   node_get_pref_ipv6_orport(node, &ipv6_or_ap);
-  
 
   /* Assume the IPv6 OR and Dir addresses are the same. */
   return fascist_firewall_choose_address_base(&ipv4_or_ap.addr,

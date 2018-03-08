@@ -1873,7 +1873,6 @@ connection_connect_log_client_use_ip_version(const connection_t *conn)
   const int must_ipv6 = (options->ClientUseIPv4 == 0);
   const int pref_ipv6 = (conn->type == CONN_TYPE_OR
                          && fascist_firewall_prefer_ipv6_orport(options));
-                          
   tor_addr_t real_addr;
   tor_addr_make_null(&real_addr, AF_UNSPEC);
 
@@ -1914,12 +1913,11 @@ connection_connect_log_client_use_ip_version(const connection_t *conn)
              "ClientPreferIPv6ORPort %d, with ClientUseIPv4 %d, and "
              "fascist_firewall_use_ipv6 %d (ClientUseIPv6 %d and UseBridges "
              "%d).",
-             
-             conn->type == CONN_TYPE_OR ? "OR" : "Dir",
-             fmt_addr(&real_addr),
-             options->ClientPreferIPv6ORPort,                         
-             options->ClientUseIPv4, fascist_firewall_use_ipv6(options),
-             options->ClientUseIPv6, options->UseBridges);
+        conn->type == CONN_TYPE_OR ? "OR" : "Dir",
+        fmt_addr(&real_addr),
+        options->ClientPreferIPv6ORPort,
+        options->ClientUseIPv4, fascist_firewall_use_ipv6(options),
+        options->ClientUseIPv6, options->UseBridges);
   }
 }
 
