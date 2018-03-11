@@ -1024,7 +1024,7 @@ fascist_firewall_choose_address_node(const node_t *node,
   node_get_pref_ipv6_dirport(node, &ipv6_dir_ap);
 
   /* Assume the IPv6 OR and Dir addresses are the same. */
-  return fascist_firewall_choose_address_base(&ipv4_or_ap.addr,
+   return fascist_firewall_choose_address_base(&ipv4_or_ap.addr,
                                               ipv4_or_ap.port,
                                               ipv4_dir_ap.port,
                                               &ipv6_or_ap.addr,
